@@ -1,0 +1,73 @@
+﻿@page "/chatbot/{BookId:int}"
+@using ChatbotFrontend.Models
+@inject HttpClient Http
+
+
+@if (Book != null)
+{
+    <h3>Ask about "@Book.Title"</h3>
+
+    <img src="@Book.ImageUrl" alt="@Book.Title" />
+    <p><strong>Author:</strong> @Book.Author</p>
+    <p>@Book.Description</p>
+
+    <div class="chatbox">
+        <textarea @bind="UserQuery"></textarea>
+        <button type="submit" @onclick="SubmitQuery">Send</button>
+        <p>@ChatResponse</p>
+    </div>
+
+   @*  <form @onsubmit="SubmitQuery">             
+        <textarea @bind="UserQuery" placeholder="Enter your query here"></textarea>     
+        <button type="submit">Send</button>       
+    </form> *@
+}
+else
+{
+    <p>Loading book details...</p>
+}
+
+@code {
+    [Parameter]
+    public int BookId { get; set; }
+
+    private Book Book;
+    private string UserQuery { get; set; } = string.Empty;
+    private string ChatResponse { get; set; }
+
+    private async Task SubmitQuery()
+    {
+        if (!string.IsNullOrWhiteSpace(UserQuery))
+        {
+            var result = await Http.PostAsJsonAsync("https://localhost:44306/api/search/ask", UserQuery);
+            ChatResponse = await result.Content.ReadAsStringAsync();
+        }
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Retrieve book details by BookId
+        //Book = Books.FirstOrDefault(b => b.Id == BookId) ?? new Book();
+
+        try
+        {
+            if (UserQuery.Length > 0)
+            {
+                SubmitQuery();
+            }
+            // Fetch the book details from the backend API
+            Book = await Http.GetFromJsonAsync<Book>($"/api/Book/{BookId}");
+
+            if (Book == null)
+            {
+                Console.WriteLine($"Book with ID {BookId} not found.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching book data: {ex.Message}");
+        }
+    }
+
+}

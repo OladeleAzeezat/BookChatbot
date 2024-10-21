@@ -1,0 +1,205 @@
+﻿@page "/bookdetails/{Id:int}"
+@using ChatbotFrontend.Models
+@inject HttpClient Http
+
+@if(Book != null)
+{
+<div class="book-details">
+    <img src="@Book.ImageUrl" alt="@Book.Title" />
+    <h2>@Book.Title</h2>
+    <p><strong>Author:</strong> @Book.Author</p>
+    <p>@Book.Description</p>
+
+    <div class="chatbot-section">
+        <a href="@($"/chatbot/{Book.Id}")">
+        <button>Ask about this book</button>
+        </a>
+    </div>
+</div>
+}
+else
+{
+    <p>Book not found or loading...</p>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Book Book;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Find the book by Id from the available list
+        //Book = Books.FirstOrDefault(b => b.Id == Id) ?? new Book();
+        try
+        {
+            Book = await Http.GetFromJsonAsync<Book>($"/api/Book/{Id}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching book data: {ex.Message}");
+        }
+
+    }
+
+    // private void NavigateToChatBot()
+    // {
+    //     NavigationManager.NavigateTo($"/chatbot/{Book.Id}");
+    // }
+
+    [Inject] private NavigationManager NavigationManager { get; set; }
+
+    // private List<Book> Books = new List<Book>
+    // {
+    //     new Book { Id = 1, Title = "Ginika's Bridesmaids", ImageUrl = "images/GB-Book1-Ara.jpg", Author = "Adesuwa O'man Nwokedi", Description = "Ara is left heartbroken..." },
+    //     new Book { Id = 2, Title = "Fourth Wing", ImageUrl = "images/FW-Book1.jpg", Author = "Rebecca Yarros", Description = "Twenty-year-old Violet Sorrengail..." },
+    //     new Book { Id = 3, Title = "Iron Flame", ImageUrl = "images/IF-Book2.jpg", Author = "Rebecca Yarros", Description = "Everyone expected Violet Sorrengail..." }
+    // };
+}
+
+
+@* @page "/bookdetails/{Id:int}"
+@using ChatbotFrontend.Models
+
+<div class="book-details">
+    <img src="@Book.ImageUrl" alt="@Book.Title" />
+    <h2>@Book.Title</h2>
+    <p><strong>Author:</strong> @Book.Author</p>
+    <p>@Book.Description</p>
+
+    <div class="chatbot-section">
+        <button @onclick="ShowChatBot">Ask about this book</button>
+    </div>
+
+    @if (isChatBoxVisible)
+    {
+
+        <div class="popup-overlay" @onclick="CloseChatBot">
+            <div class="chatbox-popup" @onclick:stopPropagation="true">
+                <span class="close" @onclick="CloseChatBot">&times;</span>
+                <h3>Ask about "@Book.Title"</h3>
+                <textarea @bind="UserQuery"></textarea>
+                <button @onclick="SubmitQuery">Send</button>
+                <p>@ChatResponse</p>
+            </div>
+        </div>
+      @*   <div class="chatbox">
+            <textarea @bind="UserQuery"></textarea>
+            <button @onclick="SubmitQuery">Send</button>
+            <p>@ChatResponse</p>
+        </div> 
+    }
+</div>
+
+@* @code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Book Book;
+    private bool isChatBoxVisible = false;
+    private string UserQuery; 
+    private string ChatResponse;
+
+    protected override void OnInitialized()
+    {
+        // Find the book by Id from the available list
+        Book = Books.FirstOrDefault(b => b.Id == Id) ?? new Book();
+    }
+
+    private void ShowChatBot()
+    {
+        isChatBoxVisible = true;
+
+        //Console.WriteLine("Chatbot button clicked");
+    }
+    private void CloseChatBot()
+    {
+        isChatBoxVisible = false;
+    }
+
+    private void SubmitQuery()
+    {
+        // Implement chatbot functionality here
+        // var response = await Http.PostAsJsonAsync("/api/chatbot", new { Query = UserQuery });
+        // ChatResponse = await response.Content.ReadAsStringAsync();
+        // For now, we are simulating a response
+        ChatResponse = "This is a simulated response about the book: " + Book.Title;
+
+    }
+
+    private List<Book> Books = new List<Book>
+    {
+        new Book { Id = 1, Title = "Ginika's Bridesmaids", ImageUrl = "images/GB-Book1-Ara.jpg", Author = "Adesuwa O'man Nwokedi", Description = "Ara is left heartbroken when her childhood sweetheart, Oye, leaves her for another woman.But she is unwilling to let go of the only man she has ever loved and is determined to do everything she can to get him back. " },
+        new Book { Id = 2, Title = "Fourth Wing", ImageUrl = "images/FW-Book1.jpg", Author = "Rebecca Yarros", Description = "Twenty-year-old Violet Sorrengail was supposed to enter the Scribe Quadrant, living a quiet life among books and history. Now, the commanding general—also known as her tough-as-talons mother—has ordered Violet to join the hundreds of candidates striving to become the elite of Navarre: dragon riders." },
+        new Book { Id = 3, Title = "Iron Flame", ImageUrl = "images/IF-Book2.jpg", Author = "Rebecca Yarros", Description ="Everyone expected Violet Sorrengail to die during her first year at Basgiath War College—Violet included. But Threshing was only the first impossible test meant to weed out the weak-willed, the unworthy, and the unlucky." }
+    };
+}  *@
+@*
+@page "/bookdetails/{Id:int}"
+
+<div class="book-details">
+    <img src="@Book.ImageUrl" alt="@Book.Title" />
+    <h2>@Book.Title</h2>
+    <p>@Book.Description</p>
+    <p><strong>Author:</strong> @Book.Author</p>
+
+    <div class="chatbot-section">
+        <button @onclick="ShowChatBot">Ask about this book</button>
+    </div>
+
+    @if (isChatBoxVisible)
+    {
+        <div class="chatbox">
+            <h4>Chatbot</h4>
+            <!-- Chatbot interface would go here -->
+            <textarea @bind="UserQuery"></textarea>
+            <button @onclick="SubmitQuery">Send</button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private BookModel Book = new BookModel();
+
+    private bool isChatBoxVisible = false;
+    private string UserQuery;
+
+    protected override void OnInitialized()
+    {
+        // Load the book details based on the Id
+        Book = Books.FirstOrDefault(b => b.Id == Id) ?? new BookModel();
+    }
+
+    private void ShowChatBot()
+    {
+        isChatBoxVisible = true;
+    }
+
+    private void SubmitQuery()
+    {
+        // Send query to chatbot (logic will be implemented later)
+        Console.WriteLine(UserQuery);
+    }
+
+    public class BookModel
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string Author { get; set; }
+        public string ImageUrl { get; set; }
+    }
+
+    // Temporary data source
+    private List<BookModel> Books = new List<BookModel>
+    {
+        new BookModel { Id = 1, Title = "Ginika's Bridesmaid", Description = "Ara is left heartbroken when her childhood sweetheart, Oye, leaves her for another woman. But she is unwilling to let go of the only man she has ever loved and is determined to do everything she can to get him back. ", Author = "Adesuwa O'man Nwokedi", ImageUrl = "images/GB-Book1-Ara.jpg" },
+        new BookModel { Id = 2, Title = "Fourth Wing", Description = "Twenty-year-old Violet Sorrengail was supposed to enter the Scribe Quadrant, living a quiet life among books and history. Now, the commanding general—also known as her tough-as-talons mother—has ordered Violet to join the hundreds of candidates striving to become the elite of Navarre: dragon riders.", Author = "Rebecca Yarros", ImageUrl = "images/FW-Book1.jpg" },
+        new BookModel { Id = 3, Title = "Iron Flame", Description = "Everyone expected Violet Sorrengail to die during her first year at Basgiath War College—Violet included. But Threshing was only the first impossible test meant to weed out the weak-willed, the unworthy, and the unlucky.", Author = "Rebecca Yarros", ImageUrl = "images/IF-Book2.jpg" }
+    };
+}
+ *@

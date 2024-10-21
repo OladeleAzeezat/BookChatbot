@@ -1,0 +1,64 @@
+﻿@* <h3>Book</h3>
+
+@code {
+
+}
+ *@
+
+ @page "/books"
+@using ChatbotFrontend.Models
+
+
+<div class="book-list">
+    @foreach (var book in Books)
+    {
+        <div class="book-item">
+           @*  <a href="@($"/bookdetails/{book.Id}")"> *@
+            <a href="@($"/chatbot/{book.Id}")">
+                <img src="@book.ImageUrl" alt="@book.Title" />
+                <p>@book.Title</p>
+            </a>
+        </div>
+    }
+</div>
+
+@code {
+    private List<Book> Books = new List<Book>
+    {
+        new Book { Id = 1, Title = "Ginika's Bridesmaids By Adesuwa O'man Nwokedi", ImageUrl = "images/GB-Book1-Ara.jpg"},
+        new Book { Id = 2, Title = "Fourth Wing By Rebecca Yarros", ImageUrl = "images/FW-Book1.jpg" },
+        new Book { Id = 3, Title = "Iron Flame By Rebecca Yarros", ImageUrl = "images/IF-Book2.jpg" }
+    };
+
+    public class Book
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string ImageUrl { get; set; }
+    }
+}
+
+
+@* @code {
+    private List<Book> books = new List<Book>
+    {
+        new Book { Title = "Ginika's Bridesmaids", Author = "Adesuwa O'man Nwokedi",
+                   Description = "Ara is left heartbroken when her childhood sweetheart, Oye, leaves her for another woman.6++++++++++++++++++But she is unwilling to let go of the only man she has ever loved and is determined to do everything she can to get him back.",
+                   CoverImageUrl = "images/GB-Book1-Ara.jpg", Price = 19.99m },
+        new Book { Title = "Book Two", Author = "Author Two",
+                   Description = "Description of Book Two",
+                   CoverImageUrl = "images/book2.jpg", Price = 15.99m }
+    };
+}
+
+<div class="book-list">
+    @foreach (var book in books)
+    {
+        <div class="book-item">
+            <img src="@book.CoverImageUrl" alt="@book.Title" style="width: 150px; height: 200px;" />
+            <h3>@book.Title</h3>
+            <p>by @book.Author</p>
+            <p>@book.Price.ToString("C")</p>
+        </div>
+    }
+</div> *@
